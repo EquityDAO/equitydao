@@ -1,5 +1,5 @@
 import { readPngFile } from 'node-libpng';
-import { PNGCollectionEncoder } from '../src';
+import { PNGCollectionEncoder } from '.';
 import { promises as fs } from 'fs';
 import { expected } from './lib';
 import { join } from 'path';

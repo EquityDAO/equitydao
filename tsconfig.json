@@ -1,11 +1,11 @@
 {
     "references": [
-        { "path": "packages/nouns-api" },
-        { "path": "packages/nouns-assets" },
-        { "path": "packages/nouns-bots" },
-        { "path": "packages/nouns-contracts" },
-        { "path": "packages/nouns-sdk" },
-        { "path": "packages/nouns-subgraph" },
-        { "path": "packages/nouns-webapp" },
+        { "path": "packages/equitydao-api" },
+        { "path": "packages/equitydao-assets" },
+        { "path": "packages/equitydao-bots" },
+        { "path": "packages/equitydao-contracts" },
+        { "path": "packages/equitydao-sdk" },
+        { "path": "packages/equitydao-subgraph" },
+        { "path": "packages/equitydao-webapp" },
     ]
 }
