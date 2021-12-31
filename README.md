@@ -1,7 +1,5 @@
 # EquityDAO
 
-Nouns DAO is a generative avatar art collective run by a group of crypto misfits.
-
 EquityDAO will make use of a Microservice Architecture; Each service serving a specific tailored need
 
 ## Services:
