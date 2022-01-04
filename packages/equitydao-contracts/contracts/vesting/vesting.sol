@@ -88,20 +88,6 @@ contract VestingWallet is Context {
     }
 
     /**
-     * @dev Release the native token (ether) that have already vested.
-     * Not needed
-     *
-     * Emits a {TokensReleased} event.
-     */
-    // function release() public virtual {
-    //     uint256 releasable = vestedAmount(uint64(block.timestamp)) - released();
-    //     require(releasable > 0, "BREEDER DAO: No ether available")
-    //     _released += releasable;
-    //     emit EtherReleased(releasable);
-    //     Address.sendValue(payable(beneficiary()), releasable);
-    // }
-
-    /**
      * @dev Release the tokens that have already vested.
      *
      * Emits a {TokensReleased} event.
@@ -115,13 +101,6 @@ contract VestingWallet is Context {
         emit ERC20Released(token, releasable);
         SafeERC20.safeTransfer(IERC20(token), beneficiary(), releasable);
     }
-
-    // /**
-    //  * @dev Calculates the amount of ether that has already vested. Default implementation is a linear vesting curve.
-    //  */
-    // function vestedAmount(uint64 timestamp) public view virtual returns (uint256) {
-    //     return _vestingSchedule(address(this).balance + released(), timestamp);
-    // }
 
     /**
      * @dev Calculates the amount of tokens that has already vested. Default implementation is a linear vesting curve.
