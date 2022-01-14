@@ -35,11 +35,10 @@ contract VestingWallet is Context {
     constructor(
         address beneficiaryAddress,
         uint64 startTimestamp,
-        uint64 durationSeconds
+        uint64 durationSeconds,
         uint64 periodSeconds
     ) {
         require(beneficiaryAddress != address(0), "VestingWallet: beneficiary is zero address");
-        require()
         _beneficiary = beneficiaryAddress;
         _start = startTimestamp;
         _duration = durationSeconds;
@@ -93,11 +92,11 @@ contract VestingWallet is Context {
      * Emits a {TokensReleased} event.
      */
     function release(address token) public virtual {
-        require(now() >= _lastRelease + _period, "BREEDER DAO: Next vesting period not reached")
+        require(now() >= _lastRelease + _period, "EQUITY DAO: Next vesting period not reached");
         uint256 releasable = vestedAmount(token, uint64(block.timestamp)) - released(token);
-        require(releasable > 0, "BREEDER DAO: No vested token available")
+        require(releasable > 0, "EQUITY DAO: No vested token available");
         _erc20Released[token] += releasable;
-        _lastRelease = now()
+        _lastRelease = now();
         emit ERC20Released(token, releasable);
         SafeERC20.safeTransfer(IERC20(token), beneficiary(), releasable);
     }
