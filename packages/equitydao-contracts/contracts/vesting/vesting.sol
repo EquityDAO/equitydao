@@ -19,27 +19,31 @@ import "./Math.sol";
  */
 contract VestingWallet is Context {
     event EtherReleased(uint256 amount);
-    event ERC20Released(address indexed token, uint256 amount);
+    event ERC20Released(uint256 amount);
 
     uint256 private _released;
-    mapping(address => uint256) private _erc20Released;
+    uint256 private _erc20Released;
     address private immutable _beneficiary;
     uint64 private immutable _start; // start date
     uint64 private immutable _duration; // 4 years
     uint64 private immutable _period; // assume na hour 
     uint64 private _lastRelease;
+    address private _erc20Token
+
 
     /**
      * @dev Set the beneficiary, start timestamp and vesting duration of the vesting wallet.
      */
     constructor(
         address beneficiaryAddress,
+        address erc20TokenAddress
         uint64 startTimestamp,
         uint64 durationSeconds,
         uint64 periodSeconds
     ) {
         require(beneficiaryAddress != address(0), "VestingWallet: beneficiary is zero address");
         _beneficiary = beneficiaryAddress;
+        _erc20Token = erc20TokenAddress
         _start = startTimestamp;
         _duration = durationSeconds;
         _period = periodSeconds;
@@ -80,10 +84,10 @@ contract VestingWallet is Context {
     }
 
     /**
-     * @dev Amount of token already released
+     * @dev Amount of erc20 token already released
      */
-    function released(address token) public view virtual returns (uint256) {
-        return _erc20Released[token];
+    function erc20Released() public view virtual returns (uint256) {
+        return _erc20Released;
     }
 
     /**
@@ -91,21 +95,21 @@ contract VestingWallet is Context {
      *
      * Emits a {TokensReleased} event.
      */
-    function release(address token) public virtual {
+    function release() public virtual {
         require(now() >= _lastRelease + _period, "EQUITY DAO: Next vesting period not reached");
-        uint256 releasable = vestedAmount(token, uint64(block.timestamp)) - released(token);
+        uint256 releasable = vestedAmount(_erc20Token, uint64(block.timestamp)) - erc20Released();
         require(releasable > 0, "EQUITY DAO: No vested token available");
-        _erc20Released[token] += releasable;
+        _erc20Released += releasable;
         _lastRelease = now();
-        emit ERC20Released(token, releasable);
-        SafeERC20.safeTransfer(IERC20(token), beneficiary(), releasable);
+        emit ERC20Released(releasable);
+        SafeERC20.safeTransfer(IERC20(_erc20Token), beneficiary(), releasable);
     }
 
     /**
      * @dev Calculates the amount of tokens that has already vested. Default implementation is a linear vesting curve.
      */
     function vestedAmount(address token, uint64 timestamp) public view virtual returns (uint256) {
-        return _vestingSchedule(IERC20(token).balanceOf(address(this)) + released(token), timestamp);
+        return _vestingSchedule(IERC20(token).balanceOf(address(this)) + erc20Released(), timestamp);
     }
 
     /**
