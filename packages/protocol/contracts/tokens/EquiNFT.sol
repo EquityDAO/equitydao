@@ -43,6 +43,9 @@ contract TellerNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
 
     /* State Variables */
 
+    // It holds the total number of tokens in existence.
+    uint256 public totalSupply;
+
     // It holds the total number of tiers.
     Counters.Counter internal _tierCounter;
 
@@ -135,7 +138,7 @@ contract TellerNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
      * @return the tokenURI
      */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require(_exists(tokenId), 'TellerNFT: URI query for nonexistent token');
+        require(_exists(tokenId), 'EquiNFT: URI query for nonexistent token');
 
         string memory baseURI = _baseURI();
         return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, _tokenURIHash(tokenId))) : '';
@@ -160,6 +163,19 @@ contract TellerNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
 
         // Set owner
         _setOwner(owner, tokenId);
+        totalSupply++;
+    }
+
+    /**
+     * @dev Runs super function and then decreases total supply.
+     *
+     * See {ERC1155Upgradeable._burn}.
+     */
+    function burn(uint256 id) internal override {
+        _burn(id);
+        // Set owner
+        _setOwner(address(0), id);
+        totalSupply--;
     }
 
     /**
@@ -211,7 +227,7 @@ contract TellerNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
      * @param minters The addresses that should allowed to mint tokens.
      */
     function initialize(address[] calldata minters) external virtual override initializer {
-        __ERC721_init('Teller NFT', 'TNFT');
+        __ERC721_init('Equi NFT', 'ENFT');
         __AccessControl_init();
 
         for (uint256 i; i < minters.length; i++) {

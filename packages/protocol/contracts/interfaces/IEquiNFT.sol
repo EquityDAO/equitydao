@@ -7,9 +7,8 @@ import '@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
 
 interface IEquiNFT {
     struct Tier {
-        uint256 baseLoanSize;
+        uint256 tokenSize;
         string[] hashes;
-        address contributionAsset;
         uint256 contributionSize;
         uint8 contributionMultiplier;
     }
