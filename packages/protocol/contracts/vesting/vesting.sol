@@ -26,27 +26,18 @@ contract VestingWallet is Context {
         uint64 cliffSeconds;
         uint64 periodSeconds;
         uint64 lastRelease;
+        uint256 released;
     }
 
-    mapping (address => Vest) vesting;
-    uint256 private _released;
-    uint256 private _erc20Released;
-    // address private immutable _beneficiary;
-    // uint64 private immutable _start; // start date
-    // uint64 private immutable _duration; // 4 years
-    // uint64 private immutable _period; // assume na hour
-    // uint64 private _lastRelease;
-    address private _erc20Token;
-
+    mapping(address => Vest) vesting;
+    address private _token;
 
     /**
      * @dev Set the beneficiary, start timestamp and vesting duration of the vesting wallet.
      */
-    constructor(
-        address erc20TokenAddress
-    ) {
-        require(erc20TokenAddress != address(0), 'VestingWallet: Token address is zero address');
-        _erc20Token = erc20TokenAddress;
+    constructor(address tokenAddress) {
+        require(tokenAddress != address(0), 'VestingWallet: Token address is zero address');
+        _token = tokenAddress;
     }
 
     function vest(
@@ -56,12 +47,13 @@ contract VestingWallet is Context {
         uint64 _cliffSeconds,
         uint64 _periodSeconds
     ) public {
-        require(beneficiaryAddress != address(0), 'VestingWallet: beneficiary is zero address');
-        vesting[beneficiaryAddress].startTimestamp = _startTimestamp;
-        vesting[beneficiaryAddress].durationSeconds = _durationSeconds;
-        vesting[beneficiaryAddress].cliffSeconds = _cliffSeconds;
-        vesting[beneficiaryAddress].periodSeconds = _periodSeconds;
-        vesting[beneficiaryAddress].lastRelease = 0;
+        require(_beneficiaryAddress != address(0), 'VestingWallet: beneficiary is zero address');
+        vesting[_beneficiaryAddress].startTimestamp = _startTimestamp;
+        vesting[_beneficiaryAddress].durationSeconds = _durationSeconds;
+        vesting[_beneficiaryAddress].cliffSeconds = _cliffSeconds;
+        vesting[_beneficiaryAddress].periodSeconds = _periodSeconds;
+        vesting[_beneficiaryAddress].lastRelease = 0;
+        vesting[_beneficiaryAddress].released = 0;
     }
 
     /**
@@ -69,12 +61,12 @@ contract VestingWallet is Context {
      */
     receive() external payable virtual {}
 
-    /**
-     * @dev Getter for the beneficiary address.
-     */
-    function beneficiary() public view virtual returns (address) {
-        return _beneficiary;
-    }
+    // /**
+    //  * @dev Getter for the beneficiary address.
+    //  */
+    // function beneficiary() public view virtual returns (address) {
+    //     return _beneficiary;
+    // }
 
     /**
      * @dev Getter for the start timestamp.
@@ -90,18 +82,13 @@ contract VestingWallet is Context {
         return _duration;
     }
 
-    /**
-     * @dev Amount of eth already released
-     */
-    function released() public view virtual returns (uint256) {
-        return _released;
-    }
+    //TODO: Cliff, Period, Last Release
 
     /**
-     * @dev Amount of erc20 token already released
+     * @dev Amount of token already released
      */
-    function erc20Released() public view virtual returns (uint256) {
-        return _erc20Released;
+    function released(address _beneficiaryAddress) public view virtual returns (uint256) {
+        return vesting[_beneficiaryAddress].released;
     }
 
     /**
@@ -109,29 +96,24 @@ contract VestingWallet is Context {
      *
      * Emits a {TokensReleased} event.
      */
-<<<<<<< HEAD:packages/equitydao-contracts/contracts/vesting/vesting.sol
-    function release() public virtual {
-        require(now() >= _lastRelease + _period, "EQUITY DAO: Next vesting period not reached");
-        uint256 releasable = vestedAmount(_erc20Token, uint64(block.timestamp)) - erc20Released();
-        require(releasable > 0, "EQUITY DAO: No vested token available");
-        _erc20Released += releasable;
-=======
-    function release(address token) public virtual {
-        require(now() >= _lastRelease + _period, 'EQUITY DAO: Next vesting period not reached');
-        uint256 releasable = vestedAmount(token, uint64(block.timestamp)) - released(token);
+    function release(address _beneficiaryAddress) public virtual {
+        require(
+            now() >= vesting[_beneficiaryAddress].lastRelease + vesting[_beneficiaryAddress].periodSeconds,
+            'EQUITY DAO: Next vesting period not reached'
+        );
+        uint256 releasable = vestedAmount(_beneficiaryAddress, uint64(block.timestamp)) - released(_beneficiaryAddress);
         require(releasable > 0, 'EQUITY DAO: No vested token available');
-        _erc20Released[token] += releasable;
->>>>>>> master:packages/protocol/contracts/vesting/vesting.sol
-        _lastRelease = now();
+        vesting[_beneficiaryAddress].released = vesting[_beneficiaryAddress].released + releasable;
+        vesting[_beneficiaryAddress].lastRelease = now();
         emit ERC20Released(releasable);
-        SafeERC20.safeTransfer(IERC20(_erc20Token), beneficiary(), releasable);
+        SafeERC20.safeTransfer(IERC20(_token), _beneficiaryAddress, releasable);
     }
 
     /**
      * @dev Calculates the amount of tokens that has already vested. Default implementation is a linear vesting curve.
      */
-    function vestedAmount(address token, uint64 timestamp) public view virtual returns (uint256) {
-        return _vestingSchedule(IERC20(token).balanceOf(address(this)) + erc20Released(), timestamp);
+    function vestedAmount(address _beneficiaryAddress, uint64 timestamp) public view virtual returns (uint256) {
+        return _vestingSchedule(IERC20(token).balanceOf(address(this)) + released(_beneficiaryAddress), timestamp);
     }
 
     /**
