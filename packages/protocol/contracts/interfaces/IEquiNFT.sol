@@ -9,8 +9,7 @@ interface IEquiNFT {
     struct Tier {
         uint256 tokenSize;
         string[] hashes;
-        uint256 contributionSize;
-        uint8 contributionMultiplier;
+        uint8 mpPercentage;
     }
 
     /**
@@ -57,6 +56,14 @@ interface IEquiNFT {
      *  - Caller must be an authorized minter
      */
     function mint(uint256 tierIndex, address owner) external;
+
+    /**
+     * @notice It burns a an existing NFT and transfers equivalent EQUI tokens.
+     * @param tokenId the token ID to burn
+     * Requirements:
+     *  - Caller must be an authorized minter
+     */
+    function burn(uint256 tokenId) external;
 
     /**
      * @notice Adds a new Tier to be minted with the given information.

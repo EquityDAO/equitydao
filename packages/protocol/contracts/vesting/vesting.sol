@@ -48,12 +48,13 @@ contract VestingWallet is Context {
         uint64 _periodSeconds
     ) public {
         require(_beneficiaryAddress != address(0), 'VestingWallet: beneficiary is zero address');
-        vesting[_beneficiaryAddress].startTimestamp = _startTimestamp;
-        vesting[_beneficiaryAddress].durationSeconds = _durationSeconds;
-        vesting[_beneficiaryAddress].cliffSeconds = _cliffSeconds;
-        vesting[_beneficiaryAddress].periodSeconds = _periodSeconds;
-        vesting[_beneficiaryAddress].lastRelease = 0;
-        vesting[_beneficiaryAddress].released = 0;
+        Vest storage vest_ = vesting[_beneficiaryAddress];
+        vest_.startTimestamp = _startTimestamp;
+        vest_.durationSeconds = _durationSeconds;
+        vest_.cliffSeconds = _cliffSeconds;
+        vest_.periodSeconds = _periodSeconds;
+        vest_.lastRelease = 0;
+        vest_.released = 0;
     }
 
     /**
@@ -113,7 +114,7 @@ contract VestingWallet is Context {
      * @dev Calculates the amount of tokens that has already vested. Default implementation is a linear vesting curve.
      */
     function vestedAmount(address _beneficiaryAddress, uint64 timestamp) public view virtual returns (uint256) {
-        return _vestingSchedule(IERC20(token).balanceOf(address(this)) + released(_beneficiaryAddress), timestamp);
+        return _vestingSchedule(IERC20(_token).balanceOf(address(this)) + released(_beneficiaryAddress), timestamp);
     }
 
     /**

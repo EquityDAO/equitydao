@@ -13,7 +13,7 @@ contract Equi {
     uint8 public constant decimals = 18;
 
     /// @notice Total number of tokens in circulation
-    uint public constant totalSupply = 100000000e18; // 10 million Equi
+    uint public constant totalSupply = 100000000e18; // 100 million Equi
 
     /// @notice Allowance amounts on behalf of others
     mapping (address => mapping (address => uint96)) internal allowances;

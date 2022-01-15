@@ -10,6 +10,7 @@ import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol'
 import '@openzeppelin/contracts/utils/Counters.sol';
 import '@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
+import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 
 // Interfaces
 import '../interfaces/IEquiNFT.sol';
@@ -67,15 +68,18 @@ contract TellerNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
     // Hash to the contract metadata located on the {_metadataBaseURI}
     string private _contractURIHash;
 
+    // EquiToken address
+    address private _token;
+
     /* Modifiers */
 
     modifier onlyAdmin() {
-        require(hasRole(ADMIN, _msgSender()), 'TellerNFT: not admin');
+        require(hasRole(ADMIN, _msgSender()), 'EquiNFT: not admin');
         _;
     }
 
     modifier onlyMinter() {
-        require(hasRole(MINTER, _msgSender()), 'TellerNFT: not minter');
+        require(hasRole(MINTER, _msgSender()), 'EquiNFT: not minter');
         _;
     }
 
@@ -171,11 +175,15 @@ contract TellerNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
      *
      * See {ERC1155Upgradeable._burn}.
      */
-    function burn(uint256 id) internal override {
+    function burn(uint256 id) external override onlyMinter {
+        address owner = ERC721Upgradeable.ownerOf(id);
+        uint256 index_ = _tokenTier[id];
+        Tier memory tier_ = _tiers[index_];
         _burn(id);
         // Set owner
         _setOwner(address(0), id);
         totalSupply--;
+        SafeERC20.safeTransfer(IERC20(_token), owner, tier_.tokenSize);
     }
 
     /**
@@ -188,13 +196,9 @@ contract TellerNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
      */
     function addTier(Tier memory newTier) external override onlyMinter {
         Tier storage tier = _tiers[_tierCounter.current()];
-
-        tier.baseLoanSize = newTier.baseLoanSize;
+        tier.tokenSize = newTier.tokenSize;
         tier.hashes = newTier.hashes;
-        tier.contributionAsset = newTier.contributionAsset;
-        tier.contributionSize = newTier.contributionSize;
-        tier.contributionMultiplier = newTier.contributionMultiplier;
-
+        tier.mpPercentage = newTier.mpPercentage;
         _tierCounter.increment();
     }
 
@@ -226,14 +230,15 @@ contract TellerNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
      * @notice Initializes the TellerNFT.
      * @param minters The addresses that should allowed to mint tokens.
      */
-    function initialize(address[] calldata minters) external virtual override initializer {
+    function initialize(address[] calldata minters, address tokenAddress) external virtual override initializer {
+        require(tokenAddress != address(0), 'VestingWallet: Token address is zero address');
         __ERC721_init('Equi NFT', 'ENFT');
         __AccessControl_init();
 
         for (uint256 i; i < minters.length; i++) {
             _setupRole(MINTER, minters[i]);
         }
-
+        _token = tokenAddress;
         _metadataBaseURI = 'https://gateway.pinata.cloud/ipfs/';
         _contractURIHash = 'QmWAfQFFwptzRUCdF2cBFJhcB2gfHJMd7TQt64dZUysk3R';
     }
@@ -250,7 +255,7 @@ contract TellerNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
         returns (bool)
     {
         return
-            interfaceId == type(ITellerNFT).interfaceId ||
+            interfaceId == type(IEquiNFT).interfaceId ||
             ERC721Upgradeable.supportsInterface(interfaceId) ||
             AccessControlUpgradeable.supportsInterface(interfaceId);
     }
