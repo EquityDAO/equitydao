@@ -32,7 +32,7 @@ import '../interfaces/IEquiNFT.sol';
  *
  * @author develop@teller.finance
  */
-contract TellerNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
+contract EquiNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
     using Counters for Counters.Counter;
     using EnumerableSet for EnumerableSet.UintSet;
     using SafeMath for uint256;

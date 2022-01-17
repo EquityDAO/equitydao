@@ -84,6 +84,7 @@ interface IEquiNFT {
     /**
      * @notice Initializes the TellerNFT.
      * @param minters The addresses that should allowed to mint tokens.
+     * @param tokenAddress The EQUI token address
      */
-    function initialize(address[] calldata minters) external;
+    function initialize(address[] calldata minters, address tokenAddress) external;
 }
