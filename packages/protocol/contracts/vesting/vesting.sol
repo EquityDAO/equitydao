@@ -99,7 +99,7 @@ contract VestingWallet is Context {
      */
     function release(address _beneficiaryAddress) public virtual {
         require(
-            block.timestamp >= vesting[_beneficiaryAddress].lastRelease + vesting[_beneficiaryAddress].periodSeconds,
+            block.timestamp >= _nextReleaseTime(_beneficiaryAddress),
             'EQUITY DAO: Next vesting period not reached'
         );
 
@@ -138,6 +138,17 @@ contract VestingWallet is Context {
             return totalAllocation;
         } else {
             return (totalAllocation * (timestamp - start(_beneficiaryAddress))) / duration(_beneficiaryAddress);
+        }
+    }
+
+    /**
+     * @dev Calculates the next release time depending on whether the token has been released before or not
+     */
+    function _nextReleaseTime(address _beneficiaryAddress) internal view virtual returns (uint256) {
+        if (vesting[_beneficiaryAddress].lastRelease == 0) {
+            return vesting[_beneficiaryAddress].startTimestamp + vesting[_beneficiaryAddress].periodSeconds;
+        } else {
+            return vesting[_beneficiaryAddress].lastRelease + vesting[_beneficiaryAddress].periodSeconds;
         }
     }
 }
