@@ -10,7 +10,7 @@ describe('VestingWallet', function () {
   const cliffSeconds = '15780000'; // 6 months
   const periodSeconds = '86400'; // daily
 
-  it('Should FAIL to deploy contract', async function () {
+  it('Should FAIL to deploy contract with empty token address', async function () {
     const tokenAddress = constants.AddressZero;
     const VestingWallet = await ethers.getContractFactory('VestingWallet');
 
@@ -19,7 +19,7 @@ describe('VestingWallet', function () {
     );
   });
 
-  it('Should FAIL to add new beneficiary to vesting wallet', async function () {
+  it('Should FAIL to add empty beneficiary to vesting wallet', async function () {
     const beneficiaryAddress = constants.AddressZero;
     const VestingWallet = await ethers.getContractFactory('VestingWallet');
     const vestingWallet = await VestingWallet.deploy(tokenAddress);
