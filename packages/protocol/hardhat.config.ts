@@ -24,6 +24,12 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    hardhat: {
+      forking: {
+        url: 'https://eth-mainnet.alchemyapi.io/v2/IavQs3xWAq19morVuIPq7WhzXqXHtMKf',
+        blockNumber: 14022971,
+      },
+    },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
       accounts: [process.env.WALLET_PRIVATE_KEY!].filter(Boolean),

@@ -84,19 +84,19 @@ contract Equi {
      * @param rawAmount The number of tokens that are approved (2^256-1 means infinite)
      * @return Whether or not the approval succeeded
      */
-    function approve(address spender, uint rawAmount) external returns (bool) {
-        uint96 amount;
-        if (rawAmount == uint(-1)) {
-            amount = uint96(-1);
-        } else {
-            amount = safe96(rawAmount, "Equi::approve: amount exceeds 96 bits");
-        }
+    // function approve(address spender, uint rawAmount) external returns (bool) {
+    //     uint96 amount;
+    //     if (rawAmount == uint(-1)) {
+    //         amount = uint96(-1);
+    //     } else {
+    //         amount = safe96(rawAmount, "Equi::approve: amount exceeds 96 bits");
+    //     }
 
-        allowances[msg.sender][spender] = amount;
+    //     allowances[msg.sender][spender] = amount;
 
-        emit Approval(msg.sender, spender, amount);
-        return true;
-    }
+    //     emit Approval(msg.sender, spender, amount);
+    //     return true;
+    // }
 
     /**
      * @notice Get the number of tokens held by the `account`
@@ -126,21 +126,21 @@ contract Equi {
      * @param rawAmount The number of tokens to transfer
      * @return Whether or not the transfer succeeded
      */
-    function transferFrom(address src, address dst, uint rawAmount) external returns (bool) {
-        address spender = msg.sender;
-        uint96 spenderAllowance = allowances[src][spender];
-        uint96 amount = safe96(rawAmount, "Equi::approve: amount exceeds 96 bits");
+    // function transferFrom(address src, address dst, uint rawAmount) external returns (bool) {
+    //     address spender = msg.sender;
+    //     uint96 spenderAllowance = allowances[src][spender];
+    //     uint96 amount = safe96(rawAmount, "Equi::approve: amount exceeds 96 bits");
 
-        if (spender != src && spenderAllowance != uint96(-1)) {
-            uint96 newAllowance = sub96(spenderAllowance, amount, "Equi::transferFrom: transfer amount exceeds spender allowance");
-            allowances[src][spender] = newAllowance;
+    //     if (spender != src && spenderAllowance != uint96(-1)) {
+    //         uint96 newAllowance = sub96(spenderAllowance, amount, "Equi::transferFrom: transfer amount exceeds spender allowance");
+    //         allowances[src][spender] = newAllowance;
 
-            emit Approval(src, spender, newAllowance);
-        }
+    //         emit Approval(src, spender, newAllowance);
+    //     }
 
-        _transferTokens(src, dst, amount);
-        return true;
-    }
+    //     _transferTokens(src, dst, amount);
+    //     return true;
+    // }
 
     /**
      * @notice Delegate votes from `msg.sender` to `delegatee`
@@ -294,7 +294,7 @@ contract Equi {
         return a - b;
     }
 
-    function getChainId() internal pure returns (uint) {
+    function getChainId() internal returns (uint) {
         uint256 chainId;
         assembly { chainId := chainid() }
         return chainId;
