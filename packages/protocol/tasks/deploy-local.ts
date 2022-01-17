@@ -1,4 +1,4 @@
-import { default as NounsAuctionHouseABI } from '../abi/contracts/NounsAuctionHouse.sol/NounsAuctionHouse.json';
+// import { default as NounsAuctionHouseABI } from '../abi/contracts/NounsAuctionHouse.sol/NounsAuctionHouse.json';
 import { task, types } from 'hardhat/config';
 import { Interface } from 'ethers/lib/utils';
 import { Contract as EthersContract } from 'ethers';
@@ -88,7 +88,7 @@ task('deploy-local', 'Deploy contracts to hardhat')
           () => contracts['NounsAuctionHouse'].instance?.address,
           () => contracts['NounsAuctionHouseProxyAdmin'].instance?.address,
           () =>
-            new Interface(NounsAuctionHouseABI).encodeFunctionData('initialize', [
+            new Interface('NounsAuctionHouseABI').encodeFunctionData('initialize', [
               contracts['NounsToken'].instance?.address,
               contracts['WETH'].instance?.address,
               args.auctionTimeBuffer,
