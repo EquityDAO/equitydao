@@ -25,7 +25,7 @@ contract VestingWallet is Context {
         uint64 durationSeconds;
         uint64 cliffSeconds;
         uint64 periodSeconds;
-        uint64 lastRelease;
+        uint256 lastRelease;
         uint256 released;
     }
 
@@ -71,15 +71,15 @@ contract VestingWallet is Context {
     /**
      * @dev Getter for the start timestamp.
      */
-    function start() public view virtual returns (uint256) {
-        return _start;
+    function start(address _beneficiaryAddress) public view virtual returns (uint256) {
+        return vesting[_beneficiaryAddress].startTimestamp;
     }
 
     /**
      * @dev Getter for the vesting duration.
      */
-    function duration() public view virtual returns (uint256) {
-        return _duration;
+    function duration(address _beneficiaryAddress) public view virtual returns (uint256) {
+        return vesting[_beneficiaryAddress].durationSeconds;
     }
 
     //TODO: Cliff, Period, Last Release
@@ -98,13 +98,13 @@ contract VestingWallet is Context {
      */
     function release(address _beneficiaryAddress) public virtual {
         require(
-            now() >= vesting[_beneficiaryAddress].lastRelease + vesting[_beneficiaryAddress].periodSeconds,
+            block.timestamp >= vesting[_beneficiaryAddress].lastRelease + vesting[_beneficiaryAddress].periodSeconds,
             'EQUITY DAO: Next vesting period not reached'
         );
         uint256 releasable = vestedAmount(_beneficiaryAddress, uint64(block.timestamp)) - released(_beneficiaryAddress);
         require(releasable > 0, 'EQUITY DAO: No vested token available');
         vesting[_beneficiaryAddress].released = vesting[_beneficiaryAddress].released + releasable;
-        vesting[_beneficiaryAddress].lastRelease = now();
+        vesting[_beneficiaryAddress].lastRelease = block.timestamp;
         emit ERC20Released(releasable);
         SafeERC20.safeTransfer(IERC20(_token), _beneficiaryAddress, releasable);
     }
@@ -113,20 +113,20 @@ contract VestingWallet is Context {
      * @dev Calculates the amount of tokens that has already vested. Default implementation is a linear vesting curve.
      */
     function vestedAmount(address _beneficiaryAddress, uint64 timestamp) public view virtual returns (uint256) {
-        return _vestingSchedule(IERC20(token).balanceOf(address(this)) + released(_beneficiaryAddress), timestamp);
+        return _vestingSchedule(_beneficiaryAddress, IERC20(_token).balanceOf(address(this)) + released(_beneficiaryAddress), timestamp);
     }
 
     /**
      * @dev Virtual implementation of the vesting formula. This returns the amout vested, as a function of time, for
      * an asset given its total historical allocation.
      */
-    function _vestingSchedule(uint256 totalAllocation, uint64 timestamp) internal view virtual returns (uint256) {
-        if (timestamp < start()) {
+    function _vestingSchedule(address _beneficiaryAddress, uint256 totalAllocation, uint64 timestamp) internal view virtual returns (uint256) {
+        if (timestamp < start(_beneficiaryAddress)) {
             return 0;
-        } else if (timestamp > (start() + duration())) {
+        } else if (timestamp > (start(_beneficiaryAddress) + duration(_beneficiaryAddress))) {
             return totalAllocation;
         } else {
-            return (totalAllocation * (timestamp - start())) / duration();
+            return (totalAllocation * (timestamp - start(_beneficiaryAddress))) / duration(_beneficiaryAddress);
         }
     }
 }

@@ -1,4 +1,4 @@
-import { default as NounsAuctionHouseABI } from '../abi/contracts/NounsAuctionHouse.sol/NounsAuctionHouse.json';
+// import { default as NounsAuctionHouseABI } from '../abi/contracts/NounsAuctionHouse.sol/NounsAuctionHouse.json';
 import { Interface } from 'ethers/lib/utils';
 import { task, types } from 'hardhat/config';
 import promptjs from 'prompt';
@@ -89,7 +89,7 @@ task('deploy', 'Deploys NFTDescriptor, NounsDescriptor, NounsSeeder, and NounsTo
           () => contracts['NounsAuctionHouse'].address,
           () => contracts['NounsAuctionHouseProxyAdmin'].address,
           () =>
-            new Interface(NounsAuctionHouseABI).encodeFunctionData('initialize', [
+            new Interface('NounsAuctionHouseABI').encodeFunctionData('initialize', [
               contracts['NounsToken'].address,
               args.weth,
               args.auctionTimeBuffer,

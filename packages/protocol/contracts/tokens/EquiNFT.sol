@@ -234,7 +234,7 @@ contract TellerNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
         returns (bool)
     {
         return
-            interfaceId == type(ITellerNFT).interfaceId ||
+            // interfaceId == type(ITellerNFT).interfaceId ||
             ERC721Upgradeable.supportsInterface(interfaceId) ||
             AccessControlUpgradeable.supportsInterface(interfaceId);
     }
