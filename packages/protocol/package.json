@@ -19,7 +19,7 @@
     "task:mint-noun": "npx hardhat mint-noun",
     "task:populate-descriptor": "npx hardhat populate-descriptor",
     "task:run-local": "npx hardhat run-local",
-    "test": "npx hardhat test",
+    "test": "npx hardhat test --network hardhat",
     "coverage": "npx hardhat coverage",
     "prepare": "yarn build"
   },
