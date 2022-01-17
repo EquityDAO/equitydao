@@ -1,6 +1,6 @@
 import { task, types } from 'hardhat/config';
 
-task('mint-noun', 'Mints a Noun')
+task('mint-nft', 'Mints an EQUI NFT')
   .addOptionalParam(
     'nounsToken',
     'The `NounsToken` contract address',

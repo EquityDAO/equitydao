@@ -1,9 +1,9 @@
 {
-  "name": "@nouns/contracts",
+  "name": "@equitydao/contracts",
   "version": "0.1.2",
-  "description": "Nouns solidity contracts & artifacts",
-  "author": "Nounders",
-  "homepage": "https://nouns.wtf",
+  "description": "EquityDao solidity contracts & artifacts",
+  "author": "EQUIDAO",
+  "homepage": "https://equitydao.io",
   "license": "GPL-3.0",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -13,10 +13,10 @@
     "build:ts": "tsc -p tsconfig.build.json",
     "build:sol": "npx hardhat compile",
     "build:declarations": "cp typechain/*.d.ts dist/typechain",
+    "flatten-vest": "sol-merger \"./contracts/*.sol\" ./flatten",
     "hardhat": "npx hardhat",
     "task:accounts": "npx hardhat accounts",
     "task:deploy": "npx hardhat deploy",
-    "task:mint-noun": "npx hardhat mint-noun",
     "task:populate-descriptor": "npx hardhat populate-descriptor",
     "task:run-local": "npx hardhat run-local",
     "test": "npx hardhat test",
@@ -44,6 +44,10 @@
     "hardhat-typechain": "^0.3.5",
     "prettier-plugin-solidity": "^1.0.0-beta.12",
     "prompt": "^1.1.0",
-    "ts-node": "^10.0.0"
+    "ts-node": "^10.0.0",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "sol-merger": "^3.1.0"
   }
 }
