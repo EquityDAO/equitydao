@@ -69,6 +69,19 @@ describe('EquiNFT', function () {
     expect(tier.mpPercentage).to.equal(newTier.mpPercentage);
   });
 
+  it('Should SUCCESSFULLY get tier hashes', async function () {
+    const signers = await ethers.getSigners();
+    const EquiNFT = await ethers.getContractFactory('EquiNFT');
+    const equiNFT = await EquiNFT.deploy();
+
+    await equiNFT.initialize([signers[0].address], tokenAddress); // adds signer[0] as a minter
+    await equiNFT.addTier(newTier); // ethers.js uses signers[0] as {from} address by default
+
+    const tierHashes = await equiNFT.getTierHashes(0);
+
+    expect(tierHashes).to.have.lengthOf(newTier.hashes.length);
+  });
+
   it('Should FAIL to mint a new token when called by non minter', async function () {
     const signers = await ethers.getSigners();
     const EquiNFT = await ethers.getContractFactory('EquiNFT');
@@ -96,5 +109,108 @@ describe('EquiNFT', function () {
 
     expect(tokens).to.have.lengthOf(1);
     expect(tokens[0]).to.equal(0);
+  });
+
+  // it('Should SUCCESSFULLY burn a existing token', async function () {
+  //   const signers = await ethers.getSigners();
+  //   const EquiNFT = await ethers.getContractFactory('EquiNFT');
+  //   const equiNFT = await EquiNFT.deploy();
+
+  //   await equiNFT.initialize([signers[0].address], tokenAddress); // adds signer[0] as a minter
+  //   await equiNFT.addTier(newTier); // ethers.js uses signers[0] as {from} address by default
+  //   await equiNFT.mint(0, signers[0].address);
+
+  //   // burn minted token
+  //   await equiNFT.burn(0);
+  //   const tokens = await equiNFT.getOwnedTokens(signers[0].address);
+  //   expect(tokens[0]).to.equal(0);
+  // });
+
+  it('Should SUCCESSFULLY get token tier', async function () {
+    const signers = await ethers.getSigners();
+    const EquiNFT = await ethers.getContractFactory('EquiNFT');
+    const equiNFT = await EquiNFT.deploy();
+
+    await equiNFT.initialize([signers[0].address], tokenAddress); // adds signer[0] as a minter
+    await equiNFT.addTier(newTier); // ethers.js uses signers[0] as {from} address by default
+    await equiNFT.mint(0, signers[0].address);
+
+    const tokenTier = await equiNFT.getTokenTier(0);
+
+    expect(tokenTier.index_).to.equal(0);
+    expect(tokenTier.tier_.tokenSize).to.equal(newTier.tokenSize);
+    expect(tokenTier.tier_.hashes).to.have.lengthOf(newTier.hashes.length);
+    expect(tokenTier.tier_.mpPercentage).to.equal(newTier.mpPercentage);
+  });
+
+  it('Should SUCCESSFULLY get all tokens owned by a specific user', async function () {
+    const signers = await ethers.getSigners();
+    const EquiNFT = await ethers.getContractFactory('EquiNFT');
+    const equiNFT = await EquiNFT.deploy();
+
+    await equiNFT.initialize([signers[0].address], tokenAddress); // adds signer[0] as a minter
+    await equiNFT.addTier(newTier); // ethers.js uses signers[0] as {from} address by default
+
+    // mint multiple tokens to signers[0].address
+    await equiNFT.mint(0, signers[0].address);
+    await equiNFT.mint(1, signers[0].address);
+    await equiNFT.mint(2, signers[0].address);
+
+    const tokens = await equiNFT.getOwnedTokens(signers[0].address);
+
+    expect(tokens).to.have.lengthOf(3);
+    expect(tokens[0]).to.equal(0);
+    expect(tokens[1]).to.equal(1);
+    expect(tokens[2]).to.equal(2);
+  });
+
+  it('Should SUCCESSFULLY return empty array if user has no token', async function () {
+    const signers = await ethers.getSigners();
+    const EquiNFT = await ethers.getContractFactory('EquiNFT');
+    const equiNFT = await EquiNFT.deploy();
+
+    await equiNFT.initialize([signers[0].address], tokenAddress); // adds signer[0] as a minter
+    await equiNFT.addTier(newTier); // ethers.js uses signers[0] as {from} address by default
+
+    const tokens = await equiNFT.getOwnedTokens(signers[0].address);
+
+    expect(tokens).to.have.lengthOf(0);
+  });
+
+  it('Should SUCCESSFULLY return the contract URI', async function () {
+    const signers = await ethers.getSigners();
+    const EquiNFT = await ethers.getContractFactory('EquiNFT');
+    const equiNFT = await EquiNFT.deploy();
+
+    await equiNFT.initialize([signers[0].address], tokenAddress); // adds signer[0] as a minter
+
+    const contractURI = await equiNFT.contractURI();
+
+    expect(contractURI).to.equal('QmWAfQFFwptzRUCdF2cBFJhcB2gfHJMd7TQt64dZUysk3R');
+  });
+
+  it('Should FAIL return the token URI for a token that does not exist', async function () {
+    const signers = await ethers.getSigners();
+    const EquiNFT = await ethers.getContractFactory('EquiNFT');
+    const equiNFT = await EquiNFT.deploy();
+
+    await equiNFT.initialize([signers[0].address], tokenAddress); // adds signer[0] as a minter
+    await expect(equiNFT.tokenURI(0)).to.be.revertedWith(
+      'EquiNFT: URI query for nonexistent token',
+    );
+  });
+
+  it('Should SUCCESSFULLY return the token URI for a token that exists', async function () {
+    const tokenBaseURI = 'https://gateway.pinata.cloud/ipfs/';
+    const signers = await ethers.getSigners();
+    const EquiNFT = await ethers.getContractFactory('EquiNFT');
+    const equiNFT = await EquiNFT.deploy();
+
+    await equiNFT.initialize([signers[0].address], tokenAddress); // adds signer[0] as a minter
+    await equiNFT.addTier(newTier); // ethers.js uses signers[0] as {from} address by default
+    await equiNFT.mint(0, signers[0].address);
+
+    const expectTokenURI = tokenBaseURI + newTier.hashes[0];
+    expect(await equiNFT.tokenURI(0)).to.equal(expectTokenURI);
   });
 });
