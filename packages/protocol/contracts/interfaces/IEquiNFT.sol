@@ -19,6 +19,12 @@ interface IEquiNFT {
     function contractURI() external view returns (string memory);
 
     /**
+     * @notice The contract token address.
+     * @return the contract token address
+     */
+    function getTokenAddress() external view returns (address);
+
+    /**
      * @notice It returns information about a Tier with from a tier index
      * @param index Tier index to get info.
      * @return tier_ the tier which belongs to the respective index
