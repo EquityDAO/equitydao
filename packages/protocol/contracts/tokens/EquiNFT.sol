@@ -11,6 +11,7 @@ import '@openzeppelin/contracts/utils/Counters.sol';
 import '@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
+import 'hardhat/console.sol';
 
 // Interfaces
 import '../interfaces/IEquiNFT.sol';
@@ -86,7 +87,7 @@ contract EquiNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
     /* External Functions */
 
     /**
-     * @notice It returns information about a Tier for a token ID.
+     * @notice It returns information about a Tier.
      * @param index Tier index to get info.
      * @return tier_ the tier which belongs to the respective index
      */
@@ -134,6 +135,14 @@ contract EquiNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
      */
     function contractURI() external view override returns (string memory) {
         return _contractURIHash;
+    }
+
+    /**
+     * @notice The contract token address.
+     * @return the contract token address
+     */
+    function getTokenAddress() external view override returns (address) {
+        return _token;
     }
 
     /**
@@ -227,11 +236,11 @@ contract EquiNFT is IEquiNFT, ERC721Upgradeable, AccessControlUpgradeable {
     }
 
     /**
-     * @notice Initializes the TellerNFT.
+     * @notice Initializes the EquiNFT.
      * @param minters The addresses that should allowed to mint tokens.
      */
     function initialize(address[] calldata minters, address tokenAddress) external virtual override initializer {
-        require(tokenAddress != address(0), 'VestingWallet: Token address is zero address');
+        require(tokenAddress != address(0), 'EquiNFT: Token address is zero address');
         __ERC721_init('Equi NFT', 'ENFT');
         __AccessControl_init();
 

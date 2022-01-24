@@ -5,14 +5,14 @@
 import { Contract, Signer } from "ethers";
 import { Provider } from "@ethersproject/providers";
 
-import type { IEquiNFT } from "../IEquiNFT";
+import type { IEquiNft } from "../IEquiNft";
 
-export class IEquiNFT__factory {
+export class IEquiNft__factory {
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): IEquiNFT {
-    return new Contract(address, _abi, signerOrProvider) as IEquiNFT;
+  ): IEquiNft {
+    return new Contract(address, _abi, signerOrProvider) as IEquiNft;
   }
 }
 
@@ -23,7 +23,7 @@ const _abi = [
         components: [
           {
             internalType: "uint256",
-            name: "baseLoanSize",
+            name: "tokenSize",
             type: "uint256",
           },
           {
@@ -32,18 +32,8 @@ const _abi = [
             type: "string[]",
           },
           {
-            internalType: "address",
-            name: "contributionAsset",
-            type: "address",
-          },
-          {
-            internalType: "uint256",
-            name: "contributionSize",
-            type: "uint256",
-          },
-          {
             internalType: "uint8",
-            name: "contributionMultiplier",
+            name: "mpPercentage",
             type: "uint8",
           },
         ],
@@ -53,6 +43,19 @@ const _abi = [
       },
     ],
     name: "addTier",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "burn",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -103,7 +106,7 @@ const _abi = [
         components: [
           {
             internalType: "uint256",
-            name: "baseLoanSize",
+            name: "tokenSize",
             type: "uint256",
           },
           {
@@ -112,18 +115,8 @@ const _abi = [
             type: "string[]",
           },
           {
-            internalType: "address",
-            name: "contributionAsset",
-            type: "address",
-          },
-          {
-            internalType: "uint256",
-            name: "contributionSize",
-            type: "uint256",
-          },
-          {
             internalType: "uint8",
-            name: "contributionMultiplier",
+            name: "mpPercentage",
             type: "uint8",
           },
         ],
@@ -155,6 +148,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "getTokenAddress",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -173,7 +179,7 @@ const _abi = [
         components: [
           {
             internalType: "uint256",
-            name: "baseLoanSize",
+            name: "tokenSize",
             type: "uint256",
           },
           {
@@ -182,18 +188,8 @@ const _abi = [
             type: "string[]",
           },
           {
-            internalType: "address",
-            name: "contributionAsset",
-            type: "address",
-          },
-          {
-            internalType: "uint256",
-            name: "contributionSize",
-            type: "uint256",
-          },
-          {
             internalType: "uint8",
-            name: "contributionMultiplier",
+            name: "mpPercentage",
             type: "uint8",
           },
         ],
@@ -211,6 +207,11 @@ const _abi = [
         internalType: "address[]",
         name: "minters",
         type: "address[]",
+      },
+      {
+        internalType: "address",
+        name: "tokenAddress",
+        type: "address",
       },
     ],
     name: "initialize",

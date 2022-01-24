@@ -1,6 +1,6 @@
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const { constants } = require('ethers');
+import { expect } from 'chai';
+import { ethers } from 'hardhat';
+import { constants } from 'ethers';
 
 describe('VestingWallet', function () {
   const tokenAddress = '0x42a472F3A494d4815ade185B1C90c8cFE8B3AF8B';
